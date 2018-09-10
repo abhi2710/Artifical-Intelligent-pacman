@@ -86,18 +86,111 @@ def depthFirstSearch(problem):
     print "Is the start a goal?", problem.isGoalState(problem.getStartState())
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
     """
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    root=(problem.getStartState(),None,None)
+    stack=util.Stack()                                      #DFS- fringe list - stack (LIFO)
+    stack.push([root,[]])
+    visited={}
+    while stack:
+        currentNode,path=stack.pop()
+        currentPosition=currentNode[0]
+        key=str(currentPosition)
+        if key in visited:
+            continue                                         #if already visited, ignore
+        visited[key] = True
+        if problem.isGoalState(currentPosition):
+            return path                                      #goal state reached
+        successors = problem.getSuccessors(currentPosition)
+        for successor in successors:
+            stack.push([successor,path+[successor[1]]])
+    return []
+
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
+
+    root=(problem.getStartState(),None,None)
+    queue = util.Queue()                                      #BFS- fringe list - queue (FIFO)
+    queue.push([root,[]])
+    visited={}
+    while queue:
+        currentNode,path=queue.pop()
+        currentPosition=currentNode[0]
+        key=str(currentPosition)
+        if key in visited:
+            continue        # if already visited, ignore
+        visited[key] = True
+        if problem.isGoalState(currentPosition):
+            return path                                      #goal state reached
+        successors = problem.getSuccessors(currentPosition)
+        for successor in successors:
+            queue.push([successor,path+[successor[1]]])
+    return []
+
+def uniformCo2stSearch(problem):
+    # Here we make use of the priority queue data stucture to store the state  (Coordinates,Path till current state)
+    # along a particular path in the search space. We make use of the second member of the tuple to obtain
+    # the path to goal .In uniform cost search the least cost node first before looking at its other siblings.we make use
+    # of explored list to keep track of nodes whose children have been generated.Also if a path with lesser cost
+    # been found out then we update the cost in the priority queue.
+
+
+    priorityQueue = util.PriorityQueue()
+    startState = problem.getStartState()
+    print(startState);
+    explored = set()
+    augmentedStartState = (startState, [])
+    priorityQueue.update(augmentedStartState, 0)
+    costFromStartNode = {}
+    costFromStartNode[augmentedStartState[0]] = 0
+
+    while (priorityQueue.isEmpty() == False):
+        currentState = priorityQueue.pop()
+        if (problem.isGoalState(currentState[0])):
+
+            return currentState[1]
+        else:
+            expanded = problem.getSuccessors(currentState[0]);
+            explored.add(currentState[0])
+            pathTillCurrent = currentState[1]
+            for node in expanded:
+                if (node[0] not in explored):
+                    if (node[0] in costFromStartNode):
+                        currentCost = costFromStartNode[currentState[0]] + node[2]
+                        previousCost = costFromStartNode[node[0]];
+                        if (currentCost < previousCost):
+                            costFromStartNode[node[0]] = currentCost
+                            priorityQueue.update((node[0], list(pathTillCurrent + [node[1]])),
+                                                 costFromStartNode[node[0]])
+                    else:
+                        costFromStartNode[node[0]] = costFromStartNode[currentState[0]] + node[2]
+                        priorityQueue.update((node[0], list(pathTillCurrent + [node[1]])), costFromStartNode[node[0]])
+
     "*** YOUR CODE HERE ***"
     util.raiseNotDefined()
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    root=problem.getStartState()
+    priorityQueue = util.PriorityQueue()                                #BFS- fringe list - queue (FIFO)
+    priorityQueue.push([root,[]],0)
+    visited=[]
+    while priorityQueue:
+        currentNode,path=priorityQueue.pop()
+        currentPosition=currentNode[0]
+        key=str(currentPosition)
+        if key in visited:
+            continue                                            #if already visited, ignore
+        visited.append(key)
+        if problem.isGoalState(currentPosition):
+            return path                                      #goal state reached
+        successors = problem.getSuccessors(currentPosition)
+        for successor in successors:
+            succKey = str(successor[0])
+            if succKey not in visited:
+                cost = problem.getCostOfActions(path+[successor[1]])
+                priorityQueue.update([successor[0],path+[successor[1]]],cost)
+    return []
+
 
 def nullHeuristic(state, problem=None):
     """
