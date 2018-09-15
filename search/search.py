@@ -100,7 +100,8 @@ def depthFirstSearch(problem):
             return path                                      #goal state reached
         successors = problem.getSuccessors(currentNode)
         for successor in successors:
-            stack.push([successor[0],path+[successor[1]]])
+            if successor[0] not in visited:
+                stack.push([successor[0],path+[successor[1]]])
     return []
 
 
@@ -123,7 +124,8 @@ def breadthFirstSearch(problem):
         successors = problem.getSuccessors(currentState)
         #print("sucs",successors)
         for successor in successors:
-            queue.push([successor[0],path+[successor[1]]])
+            if successor[0] not in visited:
+                queue.push([successor[0],path+[successor[1]]])
     return []
 
 
