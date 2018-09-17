@@ -137,7 +137,7 @@ def uniformCostSearch(problem):
     visited=set([])
     while priorityQueue:
         currentNode,path,cost=priorityQueue.pop()
-        print(currentNode)
+        #print(currentNode)
         currentPosition=currentNode
         if currentPosition in visited:
             continue                                            #if already visited, ignore
