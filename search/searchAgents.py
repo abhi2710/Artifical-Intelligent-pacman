@@ -480,13 +480,16 @@ def foodHeuristic(state, problem):
     """
     problem.heuristicInfo['wallCount'] = problem.walls.count()
     walls = problem.walls
+
     position,foodGrid = state
-    distance=0
+    distance=0;minDistance=99999999999;
+    l=foodGrid.width*foodGrid.height
     for foodPosition in foodGrid.asList():
         calcDistance=abs(position[0]-foodPosition[0])+abs(position[1]-foodPosition[1])
-        #calcDistance= ( (position[0] - foodPosition[0]) ** 2 + (position[1] - foodPosition[1]) ** 2 ) ** 0.5
         if calcDistance>distance:
             distance=calcDistance
+        elif minDistance>calcDistance:
+            minDistance=calcDistance
     return distance
 
 class ClosestDotSearchAgent(SearchAgent):

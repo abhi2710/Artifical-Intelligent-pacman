@@ -122,7 +122,6 @@ def breadthFirstSearch(problem):
         if problem.isGoalState(currentState):
             return path                                      #goal state reached
         successors = problem.getSuccessors(currentState)
-        #print("sucs",successors)
         for successor in successors:
             if successor[0] not in visited:
                 queue.push([successor[0],path+[successor[1]]])
@@ -137,7 +136,6 @@ def uniformCostSearch(problem):
     visited=set([])
     while priorityQueue:
         currentNode,path,cost=priorityQueue.pop()
-        #print(currentNode)
         currentPosition=currentNode
         if currentPosition in visited:
             continue                                            #if already visited, ignore
@@ -145,6 +143,8 @@ def uniformCostSearch(problem):
         if problem.isGoalState(currentPosition):
             return path                                         #goal state reached
         successors = problem.getSuccessors(currentPosition)
+
+        #print(currentPosition,successors)
         for successor in successors:
             succKey = successor[0]
             if succKey not in visited:
