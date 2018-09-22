@@ -72,6 +72,11 @@ def tinyMazeSearch(problem):
     w = Directions.WEST
     return  [s, s, w, s, w, w, s, w]
 
+
+#################################################
+#################### DFS ########################
+#################################################
+
 def depthFirstSearch(problem):
     """
     Search the deepest nodes in the search tree first.
@@ -93,7 +98,6 @@ def depthFirstSearch(problem):
     while not stack.isEmpty():
         currentNode,path=stack.pop()
         if currentNode in visited:
-            #print("continues")
             continue                                         #if already visited, ignore
         visited.add(currentNode)
         if problem.isGoalState(currentNode):
@@ -105,22 +109,32 @@ def depthFirstSearch(problem):
     return []
 
 
+
+
+
+
+
+
+
+
+#################################################
+#################### BFS ########################
+#################################################
+
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
 
     root=problem.getStartState()
-    #print("root: ",root)
-    queue = util.Queue()                                      #BFS- fringe list - queue (FIFO)
+    queue = util.Queue()                                            #BFS- fringe list - queue (FIFO)
     queue.push([root,[]])
     visited=set()
     while not queue.isEmpty():
         currentState,path=queue.pop()
-        #print("curr",currentState)
         if currentState in visited:
-            continue                                           # if already visited, ignore
+            continue                                                #If already visited, ignore
         visited.add(currentState)
         if problem.isGoalState(currentState):
-            return path                                      #goal state reached
+            return path                                             #goal state reached
         successors = problem.getSuccessors(currentState)
         for successor in successors:
             if successor[0] not in visited:
@@ -128,29 +142,44 @@ def breadthFirstSearch(problem):
     return []
 
 
+
+
+
+
+
+
+
+
+
+#################################################
+#################### UCS ########################
+#################################################
+
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     root=problem.getStartState()
-    priorityQueue = util.PriorityQueue()                                #BFS- fringe list - queue (FIFO)
+    priorityQueue = util.PriorityQueue()                            #UCS- fringe list - Priority queue
     priorityQueue.push([root,[],0],0)
     visited=set([])
     while priorityQueue:
         currentNode,path,cost=priorityQueue.pop()
         currentPosition=currentNode
         if currentPosition in visited:
-            continue                                            #if already visited, ignore
+            continue                                                #if already visited, ignore
         visited.add(currentPosition)
         if problem.isGoalState(currentPosition):
-            return path                                         #goal state reached
+            return path                                             #Goal state reached
         successors = problem.getSuccessors(currentPosition)
-
-        #print(currentPosition,successors)
         for successor in successors:
             succKey = successor[0]
             if succKey not in visited:
-                newcost= cost+ successor[2]
+                newcost= cost+ successor[2]                        #cost of reaching till here + cost of new action
                 priorityQueue.push([successor[0],path+[successor[1]],newcost],newcost)
     return []
+
+
+
+
 
 
 def nullHeuristic(state, problem=None):
@@ -160,29 +189,41 @@ def nullHeuristic(state, problem=None):
     """
     return 0
 
+
+
+
+
+
+
+#################################################
+#################### A* ########################
+#################################################
+
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     root=problem.getStartState()
-    priorityQueue = util.PriorityQueue()                                #BFS- fringe list - queue (FIFO)
+    priorityQueue = util.PriorityQueue()                            #A*- fringe list - priority queue
     priorityQueue.push([root,[],0],0)
     visited=set([])
     while priorityQueue:
         currentNode,path,cost=priorityQueue.pop()
         currentPosition=currentNode
         if currentPosition in visited:
-            continue                                            #if already visited, ignore
+            continue                                                #If already visited, ignore
         visited.add(currentPosition)
         if problem.isGoalState(currentPosition):
-            return path                                         #goal state reached
+            return path                                             #Goal state reached
         successors = problem.getSuccessors(currentPosition)
         for successor in successors:
             succKey = successor[0]
             if succKey not in visited:
-                fCost =cost+successor[2]
-                hCost=heuristic(successor[0], problem)
-                totalCost=fCost+hCost
+                fCost =cost+successor[2]                            #f(n) = Cost of reaching till here + cost of next action
+                hCost=heuristic(successor[0], problem)              #h(n) = Cost of heuristic for next action
+                totalCost=fCost+hCost                               #total cost = f(n) + h(n)
                 priorityQueue.push([successor[0],path+[successor[1]],fCost],totalCost)
     return []
+
+
 
 
 # Abbreviations

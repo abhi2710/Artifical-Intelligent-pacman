@@ -325,7 +325,6 @@ class CornersProblem(search.SearchProblem):
             #   nextx, nexty = int(x + dx), int(y + dy)
             #   hitsWall = self.walls[nextx][nexty]
 
-            #print("state",state)
             x,y = state[0]
             dx, dy = Actions.directionToVector(action)
             nextx, nexty = int(x + dx), int(y + dy)
@@ -334,15 +333,11 @@ class CornersProblem(search.SearchProblem):
             if not hitsWall:
                 visited = list(state[1])
                 if (nextx, nexty) in self.corners:
-                #print("found")
                     visited.append(nextPosition)
-                #print(visited)
-                successors.append(
-                    (
-                    (nextPosition,tuple(set(visited))),
-                    action,
-                    1
-                    )
+                successors.append((
+                    (nextPosition,tuple(set(visited))),                                     #State - (Next position,visited)
+                    action,                                                                 #ACTION - direction of next movement
+                    1)
                 )
         self._expanded += 1 # DO NOT CHANGE
         return successors
@@ -362,31 +357,16 @@ class CornersProblem(search.SearchProblem):
 
 
 def cornersHeuristic(state, problem):
-    """
-    A heuristic for the CornersProblem that you defined.
-
-      state:   The current search state
-               (a data structure you chose in your search problem)
-
-      problem: The CornersProblem instance for this layout.
-
-    This function should always return a number that is a lower bound on the
-    shortest path from the state to a goal of the problem; i.e.  it should be
-    admissible (as well as consistent).
-    """
-    corners = problem.corners # These are the corner coordinates
-    walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
-
+    # Return farthest distance from corner to state position
+    corners = problem.corners                                                               # These are the corner coordinates
     distance=0
     position=state[0]
     for corner in corners:
         if corner not in state[1]:
-            calcDistance=abs(position[0]-corner[0])+abs(position[1]-corner[1])
-            #calcDistance= ( (position[0] - corner[0]) ** 2 + (position[1] - corner[1]) ** 2 ) ** 0.5
-            if calcDistance>distance:
+            calcDistance=abs(position[0]-corner[0])+abs(position[1]-corner[1])              # Manhattan Distance from corner to state position
+            if calcDistance>distance:                                                       # Maximum Distamce
                 distance=calcDistance
-    "*** YOUR CODE HERE ***"
-    return distance # Default to trivial solution
+    return distance
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
@@ -478,19 +458,24 @@ def foodHeuristic(state, problem):
     Subsequent calls to this heuristic can access
     problem.heuristicInfo['wallCount']
     """
-    problem.heuristicInfo['wallCount'] = problem.walls.count()
-    walls = problem.walls
 
     position,foodGrid = state
-    distance=0;minDistance=99999999999;
-    l=foodGrid.width*foodGrid.height
+    distance=0;selectedFoodPosition=position
     for foodPosition in foodGrid.asList():
         calcDistance=abs(position[0]-foodPosition[0])+abs(position[1]-foodPosition[1])
         if calcDistance>distance:
             distance=calcDistance
-        elif minDistance>calcDistance:
-            minDistance=calcDistance
-    return distance
+            selectedFoodPosition=foodPosition
+    leftOrRight=position[0] - selectedFoodPosition[0];countFoodPoints = 0
+    for foodPoint in foodGrid.asList():
+        if leftOrRight==0:
+            countFoodPoints += 1 if (position[0] - foodPoint[0]) != 0 else 0
+        elif leftOrRight > 0:
+            countFoodPoints += 1 if (position[0] - foodPoint[0]) < 0 else 0
+        else:
+            countFoodPoints += 1 if (position[0] - foodPoint[0]) > 0 else 0
+    return distance+countFoodPoints
+
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
