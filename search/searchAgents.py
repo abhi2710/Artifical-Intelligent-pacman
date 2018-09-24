@@ -460,13 +460,15 @@ def foodHeuristic(state, problem):
     """
 
     position,foodGrid = state
-    distance=0;selectedFoodPosition=position
+    distance=0
+    selectedFoodPosition=position
     for foodPosition in foodGrid.asList():
         calcDistance=abs(position[0]-foodPosition[0])+abs(position[1]-foodPosition[1])
         if calcDistance>distance:
             distance=calcDistance
             selectedFoodPosition=foodPosition
-    leftOrRight=position[0] - selectedFoodPosition[0];countFoodPoints = 0
+    leftOrRight=position[0] - selectedFoodPosition[0]
+    countFoodPoints = 0
     for foodPoint in foodGrid.asList():
         if leftOrRight==0:
             countFoodPoints += 1 if (position[0] - foodPoint[0]) != 0 else 0
