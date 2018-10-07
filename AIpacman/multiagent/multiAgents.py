@@ -206,17 +206,98 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
       Your minimax agent with alpha-beta pruning (question 3)
     """
 
+    def minValue(self,depth,numAgents,agentIndex,gameState,a,b):
+        if depth == 0 or gameState.isWin() or gameState.isLose():               #BASE CASE:- Depth is 0  Or win  Or  lose
+            return (self.evaluationFunction(gameState), 'Stop')
+
+        nextMoves = gameState.getLegalActions(agentIndex)                       #Get next legal actions
+        bestMoveScore = float('inf');bestMove = 'Stop'
+        score = float('inf')
+        for move in nextMoves:
+            successorGameState = gameState.generateSuccessor(agentIndex, move)  #Get successor game state
+            if agentIndex  + 1 < numAgents:
+                score = min(self.minValue(depth, numAgents, agentIndex + 1 , successorGameState,a,b)[0],score)
+            else:
+                score = min(self.maxValue(depth-1, numAgents, 0 , successorGameState,a,b)[0],score)
+            if score < a:
+                return score,move                                            #PRUNING
+            b=min(score,b)
+            if bestMoveScore > score:                                        #Choose minimum of all min values
+                bestMoveScore = score
+                bestMove = move
+        return (bestMoveScore, bestMove)
+
+
+    def maxValue(self,depth,numAgents,agentIndex,gameState,a,b):
+        if depth == 0 or gameState.isWin() or gameState.isLose():               #BASE CASE:- Depth is 0  Or win  Or  lose
+            return (self.evaluationFunction(gameState), 'Stop')
+
+        nextMoves=gameState.getLegalActions(agentIndex)                         #Get next legal actions
+        bestMoveScore=float('-inf');bestMove='Stop'
+        score=float('-inf')
+        for move in nextMoves:
+            successorGameState=gameState.generateSuccessor(agentIndex,move)      #Get successor game state
+            #print(self.minValue(depth, numAgents, agentIndex+1, successorGameState,a,b)[0],score)
+            score = max(self.minValue(depth, numAgents, agentIndex+1, successorGameState,a,b)[0],score)
+            if score > b:
+                return score,move                                               #PRUNING
+            a=max(score,a)
+            if bestMoveScore < score:                                           #choose maximum of all min values
+                bestMoveScore = score
+                bestMove = move
+        return (bestMoveScore,bestMove)
+
+
     def getAction(self, gameState):
         """
           Returns the minimax action using self.depth and self.evaluationFunction
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        numAgents = gameState.getNumAgents()
+        agentIndex=self.index
+        a=float('-inf');b=float('inf')
+        (bestScore,bestMove) = self.maxValue(self.depth,numAgents,agentIndex,gameState,a,b)
+        return bestMove
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
       Your expectimax agent (question 4)
     """
+    def minValue(self,depth,numAgents,agentIndex,gameState):
+        if depth == 0 or gameState.isWin() or gameState.isLose():               #BASE CASE:- Depth is 0  Or win  Or  lose
+            return (self.evaluationFunction(gameState), 'Stop')
+
+        nextMoves = gameState.getLegalActions(agentIndex)                       #Get next legal actions
+        totalScore = 0 ;bestMove = None
+
+        for move in nextMoves:
+            successorGameState = gameState.generateSuccessor(agentIndex, move)  #Get successor game state
+            if agentIndex  + 1 < numAgents:
+                score,action = self.minValue(depth, numAgents, agentIndex + 1 , successorGameState)
+            else:
+                score,action = self.maxValue(depth-1, numAgents, 0 , successorGameState)
+            totalScore += score
+        score = totalScore / len(nextMoves)                                     #Return Average
+        return (score,'Stop')
+
+
+
+
+
+
+    def maxValue(self,depth,numAgents,agentIndex,gameState):
+        if depth == 0 or gameState.isWin() or gameState.isLose():               #BASE CASE:- Depth is 0  Or win  Or  lose
+            return (self.evaluationFunction(gameState), 'Stop')
+
+        nextMoves=gameState.getLegalActions(agentIndex)                         #get next legal actions
+        bestMoveScore=float('-inf');bestMove=None
+        for move in nextMoves:
+            successorGameState=gameState.generateSuccessor(agentIndex,move)      #get successor game state
+            score,action = self.minValue(depth, numAgents, agentIndex+1, successorGameState)
+            if bestMoveScore < score:                                           #choose maximum of all min values
+                bestMoveScore = score
+                bestMove = move
+        return (bestMoveScore,bestMove)
+
 
     def getAction(self, gameState):
         """
@@ -225,8 +306,10 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
           All ghosts should be modeled as choosing uniformly at random from their
           legal moves.
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        numAgents = gameState.getNumAgents()
+        agentIndex=0
+        (bestScore,bestMove) = self.maxValue(self.depth,numAgents,agentIndex,gameState)
+        return bestMove
 
 def betterEvaluationFunction(currentGameState):
     """
@@ -235,7 +318,6 @@ def betterEvaluationFunction(currentGameState):
 
       DESCRIPTION: <write something here so we know what you did>
     """
-    "*** YOUR CODE HERE ***"
     util.raiseNotDefined()
 
 # Abbreviation
