@@ -73,8 +73,33 @@ class ReflexAgent(Agent):
         newGhostStates = successorGameState.getGhostStates()
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
-        "*** YOUR CODE HERE ***"
-        return successorGameState.getScore()
+
+        totalScaredTimes=0                                          #total scare times of all the ghosts
+        for scaredTime in newScaredTimes:                           #totalScaredTimes==0 means all ghosts are active
+            totalScaredTimes+=scaredTime
+
+        score=0
+        GhostPositions = successorGameState.getGhostPositions()
+        for ghostPos in GhostPositions:
+            ghostDistance = util.manhattanDistance(ghostPos,newPos)
+            if ghostDistance <= 2 and totalScaredTimes == 0:          #if ghost is nearby and ghosts are active, minimize score
+                score-=10
+
+        if currentGameState.hasFood(newPos[0],newPos[1]):             #if food is newPos, add score
+            score+=5
+
+        currPos = currentGameState.getPacmanPosition()
+        minFoodDistance = float('inf')
+        nextMinFoodDistance = float('inf')
+        for food in newFood.asList():
+            foodDistance = util.manhattanDistance(food,currPos)
+            minFoodDistance=min(minFoodDistance,foodDistance)
+            nextFoodDistance = util.manhattanDistance(food, newPos)
+            nextMinFoodDistance = min(nextMinFoodDistance, nextFoodDistance)
+
+        score+=3 if nextMinFoodDistance < minFoodDistance else 2  #if minFoodDistance(Next Position) is less than minFoodDistance(Curr pos)
+                                                                  #Add more score
+        return score
 
 def scoreEvaluationFunction(currentGameState):
     """
