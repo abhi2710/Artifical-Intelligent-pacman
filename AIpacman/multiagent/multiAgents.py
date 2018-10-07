@@ -64,7 +64,7 @@ class ReflexAgent(Agent):
         scared because of Pacman having eaten a power pellet.
 
         Print out these variables to see what you're getting, then combine them
-        to create a masterful evaluation function.
+        to create a masterful evaluationx function.
         """
         # Useful information you can extract from a GameState (pacman.py)
         successorGameState = currentGameState.generatePacmanSuccessor(action)
@@ -136,6 +136,48 @@ class MinimaxAgent(MultiAgentSearchAgent):
       Your minimax agent (question 2)
     """
 
+
+    def minValue(self,depth,numAgents,agentIndex,gameState):
+        if depth == 0 or gameState.isWin() or gameState.isLose():               #BASE CASE:- Depth is 0  Or win  Or  lose
+            return (self.evaluationFunction(gameState), 'Stop')
+
+        nextMoves = gameState.getLegalActions(agentIndex)                       # get next legal actions
+        bestMoveScore = float('inf');bestMove = None
+
+        for move in nextMoves:
+            successorGameState = gameState.generateSuccessor(agentIndex, move)       # get successor game state
+            if agentIndex  + 1 < numAgents:
+                score,action = self.minValue(depth, numAgents, agentIndex + 1 , successorGameState)
+            else:
+                score,action = self.maxValue(depth-1, numAgents, 0 , successorGameState)
+            if bestMoveScore > score:                                        # choose minimum of all min values
+                bestMoveScore = score
+                bestMove = move
+        return (bestMoveScore, bestMove)
+
+
+
+
+
+
+    def maxValue(self,depth,numAgents,agentIndex,gameState):
+        if depth == 0 or gameState.isWin() or gameState.isLose():           #BASE CASE:- Depth is 0  Or win  Or  lose
+            return (self.evaluationFunction(gameState), 'Stop')
+
+        nextMoves=gameState.getLegalActions(agentIndex)                     #get next legal actions
+        bestMoveScore=float('-inf');bestMove=None
+        for move in nextMoves:
+            successorGameState=gameState.generateSuccessor(agentIndex,move)      #get successor game state
+            score,action = self.minValue(depth, numAgents, agentIndex+1, successorGameState)
+            if bestMoveScore < score:                                    #choose maximum of all min values
+                bestMoveScore = score
+                bestMove = move
+
+        return (bestMoveScore,bestMove)
+
+
+
+
     def getAction(self, gameState):
         """
           Returns the minimax action from the current gameState using self.depth
@@ -153,7 +195,10 @@ class MinimaxAgent(MultiAgentSearchAgent):
           gameState.getNumAgents():
             Returns the total number of agents in the game
         """
-        "*** YOUR CODE HERE ***"
+        numAgents = gameState.getNumAgents()
+        agentIndex=0
+        (bestScore,bestMove) = self.maxValue(self.depth,numAgents,agentIndex,gameState)
+        return bestMove
         util.raiseNotDefined()
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
